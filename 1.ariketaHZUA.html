@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica MRUA - 3º ESO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fontsource/plus-jakarta-sans@5.0.20/index.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; }
+        @media print {
+            body { background: #fff; padding: 0; margin: 0; }
+            .no-print { display: none !important; }
+            .sheet { box-shadow: none !important; border: none !important; border-radius: 0 !important; max-width: 100% !important; margin: 0 !important; }
+            input, textarea { border: 1px solid #94a3b8 !important; background: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .bg-slate-900 { background: #0f172a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .bg-blue-50 { background: #eff6ff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .bg-slate-50 { background: #f8fafc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .page-break { page-break-before: always; }
+        }
+        .input-line {
+            border-bottom: 2px solid #e2e8f0;
+            background: transparent;
+            padding: 0.15rem 0.4rem;
+            outline: none;
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            font-size: 1.1rem;
+            color: #0f172a;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+        .input-line:focus { border-bottom-color: #3b82f6; }
+        .equation-input {
+            width: 50px;
+            border-bottom: 2px solid #e2e8f0;
+            background: transparent;
+            text-align: center;
+            outline: none;
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            padding: 0;
+            margin: 0 3px;
+        }
+        .graph-paper {
+            background-image: 
+                linear-gradient(#e2e8f0 1px, transparent 1px),
+                linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .box-area {
+            min-height: 70px;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            background: #ffffff;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen p-4 md:p-8">
+    
+    <!-- Controles -->
+    <div class="no-print fixed top-4 right-4 z-50 flex gap-3">
+        <button onclick="window.print()" class="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-slate-800 transition cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+            Imprimir / PDF
+        </button>
+        <button id="toggleKey" class="flex items-center gap-2 bg-white text-slate-700 px-4 py-2 rounded-lg shadow-lg border border-slate-200 hover:bg-slate-50 transition cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+            Solucionario
+        </button>
+    </div>
+
+    <div class="sheet max-w-4xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+        <!-- Encabezado -->
+        <header class="bg-slate-900 text-white p-6 md:p-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold tracking-tight">Cinemática: MRUA</h1>
+                    <p class="text-slate-400 text-sm mt-1">Movimiento Rectilíneo Uniformemente Acelerado</p>
+                </div>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div class="bg-white/10 p-3 rounded-lg">
+                        <span class="block text-xs text-slate-400 uppercase">Alumno/a</span>
+                        <input type="text" class="bg-transparent w-full border-none outline-none text-white placeholder-white/50" placeholder="">
+                    </div>
+                    <div class="bg-white/10 p-3 rounded-lg">
+                        <span class="block text-xs text-slate-400 uppercase">Fecha</span>
+                        <input type="text" class="bg-transparent w-full border-none outline-none text-white placeholder-white/50" placeholder="">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Explicación del Caso -->
+        <section class="p-6 md:p-8 border-b border-slate-100">
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                <h2 class="font-semibold text-blue-800 mb-1">Explicación del Caso</h2>
+                <p class="text-slate-700 leading-relaxed">
+                    Un vehículo circula por una carretera recta. En un instante dado (<span class="italic font-serif">t = 0</span>), se encuentra a una distancia de <strong>100 m</strong> del observador (<span class="italic font-serif">x₀</span>), y su velocidad es de <strong>90 km/h</strong> (<span class="italic font-serif">v₀</span>). En ese momento el conductor frena, aplicando una aceleración de <strong>−1 m/s²</strong> (<span class="italic font-serif">a</span>) (es decir, decelera).
+                </p>
+            </div>
+        </section>
+
+        <main class="p-6 md:p-8 space-y-8">
+            <!-- PASO 1 -->
+            <section>
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-bold">1</span>
+                    <h3 class="font-semibold text-lg">Datos y Unidades (Sistema Internacional - SI)</h3>
+                </div>
+                <p class="text-sm text-slate-500 mb-4">Escribe los datos del problema y, si es necesario, convierte las unidades al Sistema Internacional (m y m/s). RECUERDA: ¡pon siempre las unidades junto a los números!</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="block text-sm text-slate-500 mb-1">Posición inicial</span>
+                        <span class="font-serif italic text-lg">x₀ = <input type="text" class="input-line w-24"></span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="block text-sm text-slate-500 mb-1">Velocidad inicial</span>
+                        <span class="font-serif italic text-lg">v₀ = 90 km/h → <input type="text" class="input-line w-24"></span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="block text-sm text-slate-500 mb-1">Aceleración</span>
+                        <span class="font-serif italic text-lg">a = <input type="text" class="input-line w-24"></span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PASO 2 -->
+            <section>
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-bold">2</span>
+                    <h3 class="font-semibold text-lg">Descripción del movimiento</h3>
+                </div>
+                <p class="text-sm text-slate-500 mb-2">Describe con tus palabras qué está ocurriendo con el vehículo. ¿De dónde parte? ¿Hacia dónde va? ¿Está acelerando o frenando? ¿Qué significa eso?</p>
+                <div class="box-area" contenteditable="true"></div>
+            </section>
+
+            <!-- PASO 3 -->
+            <section>
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-bold">3</span>
+                    <h3 class="font-semibold text-lg">Escribe TUS ecuaciones</h3>
+                </div>
+                <p class="text-sm text-slate-500 mb-4">Tomando las ecuaciones generales, sustituye TUS datos del paso 1 para obtener las ecuaciones específicas de este vehículo.</p>
+                <div class="space-y-4">
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                        <span class="text-sm font-semibold text-slate-600 block mb-2">Ecuación de la posición:</span>
+                        <div class="flex flex-col md:flex-row gap-6 items-start md:items-center">
+                            <div class="text-slate-600 font-serif italic text-base">General: x = x₀ + v₀·t + ½·a·t²</div>
+                            <div class="flex items-center font-serif italic text-lg">
+                                Tuya: x = 
+                                <input type="text" class="equation-input"> + 
+                                <input type="text" class="equation-input">·t + ½·(
+                                <input type="text" class="equation-input">)·t²
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                        <span class="text-sm font-semibold text-slate-600 block mb-2">Ecuación de la velocidad:</span>
+                        <div class="flex flex-col md:flex-row gap-6 items-start md:items-center">
+                            <div class="text-slate-600 font-serif italic text-base">General: v = v₀ + a·t</div>
+                            <div class="flex items-center font-serif italic text-lg">
+                                Tuya: v = 
+                                <input type="text" class="equation-input"> + (
+                                <input type="text" class="equation-input">)·t
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PASO 4 -->
+            <section class="page-break">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-bold">4</span>
+                    <h3 class="font-semibold text-lg">Responde las preguntas (paso a paso)</h3>
+                </div>
+                <div class="space-y-5">
+                    <div class="p-4 border border-slate-200 rounded-xl">
+                        <span class="font-semibold text-blue-700">A) ¿Cuándo se detendrá?</span>
+                        <p class="text-xs text-slate-500 mt-1">💡 Ayuda: Cuando el vehículo se detiene, su velocidad es cero (v = 0). Usa la ecuación de la velocidad para calcular el tiempo (t).</p>
+                        <div class="mt-3">Resultado (t) = <input type="text" class="input-line w-32"> s</div>
+                    </div>
+                    <div class="p-4 border border-slate-200 rounded-xl">
+                        <span class="font-semibold text-blue-700">B) ¿Hasta dónde llegará?</span>
+                        <p class="text-xs text-slate-500 mt-1">💡 Ayuda: Introduce el tiempo (t) que has obtenido en la caja anterior en la ecuación de la posición (x) para calcular la distancia máxima.</p>
+                        <div class="mt-3">Resultado (x) = <input type="text" class="input-line w-32"> m</div>
+                    </div>
+                    <div class="p-4 border border-slate-200 rounded-xl">
+                        <span class="font-semibold text-blue-700">C) ¿Cuándo pasará por los 150 m?</span>
+                        <p class="text-xs text-slate-500 mt-1">💡 Ayuda: Ahora sabes la posición (x = 150). Usa la ecuación de la posición y despeja el tiempo (t). ¡Es una ecuación de 2º grado!</p>
+                        <div class="mt-3">Resultado (t) = <input type="text" class="input-line w-32"> s</div>
+                    </div>
+                    <div class="p-4 border border-slate-200 rounded-xl">
+                        <span class="font-semibold text-blue-700">D) ¿Qué velocidad tendrá?</span>
+                        <p class="text-xs text-slate-500 mt-1">💡 Ayuda: Ya sabes cuánto tiempo ha pasado cuando pasa por los 150 metros (en la caja C). Introduce esa t en la ecuación de la velocidad.</p>
+                        <div class="mt-3">Resultado (v) = <input type="text" class="input-line w-32"> m/s</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PASO 5 -->
+            <section>
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-bold">5</span>
+                    <h3 class="font-semibold text-lg">Representa las gráficas</h3>
+                </div>
+                <p class="text-sm text-slate-500 mb-4">Completa la tabla con diferentes valores de tiempo y después, sitúa los puntos en las gráficas milimetradas. Une los puntos con una línea.</p>
+                
+                <div class="overflow-x-auto mb-6">
+                    <table class="w-full text-center border-collapse border border-slate-300 rounded-lg overflow-hidden">
+                        <thead class="bg-slate-100">
+                            <tr>
+                                <th class="p-2 border border-slate-300 font-semibold">t (s)</th>
+                                <th class="p-2 border border-slate-300 font-semibold">x (m)</th>
+                                <th class="p-2 border border-slate-300 font-semibold">v (m/s)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="p-2 border border-slate-300">0</td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td></tr>
+                            <tr><td class="p-2 border border-slate-300">5</td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td></tr>
+                            <tr><td class="p-2 border border-slate-300">10</td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td></tr>
+                            <tr><td class="p-2 border border-slate-300">15</td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td></tr>
+                            <tr><td class="p-2 border border-slate-300">20</td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td></tr>
+                            <tr><td class="p-2 border border-slate-300">25</td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Gráfica x-t -->
+                    <div class="border border-slate-200 rounded-xl p-3 h-72 relative bg-white graph-paper">
+                        <span class="absolute top-2 left-3 text-xs text-slate-600 font-semibold bg-white/80 px-1 z-10">Gráfica Posición - Tiempo (x − t)</span>
+                        <svg class="w-full h-full mt-8" viewBox="0 0 300 250" preserveAspectRatio="none">
+                            <path d="M 30 220 L 30 20 M 30 220 L 280 220" stroke="#0f172a" stroke-width="2" />
+                            <text x="260" y="245" class="text-xs fill-slate-500" font-family="sans-serif">t (s)</text>
+                            <text x="10" y="120" class="text-xs fill-slate-500" font-family="sans-serif" transform="rotate(-90 10,120)">x (m)</text>
+                            <text x="25" y="240" class="text-xs fill-slate-400" font-family="sans-serif">0</text>
+                        </svg>
+                    </div>
+                    <!-- Gráfica v-t -->
+                    <div class="border border-slate-200 rounded-xl p-3 h-72 relative bg-white graph-paper">
+                        <span class="absolute top-2 left-3 text-xs text-slate-600 font-semibold bg-white/80 px-1 z-10">Gráfica Velocidad - Tiempo (v − t)</span>
+                        <svg class="w-full h-full mt-8" viewBox="0 0 300 250" preserveAspectRatio="none">
+                            <path d="M 30 220 L 30 20 M 30 220 L 280 220" stroke="#0f172a" stroke-width="2" />
+                            <text x="260" y="245" class="text-xs fill-slate-500" font-family="sans-serif">t (s)</text>
+                            <text x="10" y="120" class="text-xs fill-slate-500" font-family="sans-serif" transform="rotate(-90 10,120)">v (m/s)</text>
+                            <text x="25" y="240" class="text-xs fill-slate-400" font-family="sans-serif">0</text>
+                        </svg>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Solucionario (Oculto) -->
+        <div id="answerKey" class="hidden bg-amber-50 border-t-2 border-amber-200 p-6 md:p-8 page-break">
+            <h3 class="text-xl font-bold text-amber-800 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Solucionario (Solo para el docente)
+            </h3>
+            <div class="grid md:grid-cols-2 gap-4 text-sm text-amber-900">
+                <div class="p-3 bg-white rounded border border-amber-200">
+                    <strong>Paso 1:</strong> x₀ = 100 m | v₀ = 90 km/h = <strong>25 m/s</strong> | a = -1 m/s²
+                </div>
+                <div class="p-3 bg-white rounded border border-amber-200">
+                    <strong>Ecuaciones:</strong> x = 100 + 25t - 0.5t² | v = 25 - t
+                </div>
+                <div class="p-3 bg-white rounded border border-amber-200">
+                    <strong>A) t<sub>paro</sub>:</strong> 0 = 25 - t → <strong>t = 25 s</strong>
+                </div>
+                <div class="p-3 bg-white rounded border border-amber-200">
+                    <strong>B) x<sub>máx</sub>:</strong> x = 100 + 25(25) - 0.5(625) = 100 + 625 - 312.5 → <strong>412,5 m</strong>
+                </div>
+                <div class="p-3 bg-white rounded border border-amber-200">
+                    <strong>C) t en 150 m:</strong> 150 = 100 + 25t - 0.5t² → 0.5t² - 25t + 50 = 0 → t² - 50t + 100 = 0 → t ≈ <strong>2,08 s</strong> (la otra solución es >25s, no válida)
+                </div>
+                <div class="p-3 bg-white rounded border border-amber-200">
+                    <strong>D) v en 2,08 s:</strong> v = 25 - 2,08 → <strong>22,92 m/s</strong>
+                </div>
+            </div>
+        </div>
+
+        <footer class="bg-slate-50 p-4 text-center text-xs text-slate-400 border-t border-slate-200">
+            Diseñado para 3º ESO · Física y Química · Cinemática MRUA
+        </footer>
+    </div>
+
+    <script>
+        const keyBtn = document.getElementById('toggleKey');
+        const keyPanel = document.getElementById('answerKey');
+        
+        keyBtn.addEventListener('click', () => {
+            const isHidden = keyPanel.classList.toggle('hidden');
+            if (isHidden) {
+                keyBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg> Solucionario`;
+            } else {
+                keyBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg> Ocultar Solucionario`;
+            }
+        });
+
+        document.querySelectorAll('[contenteditable]').forEach(box => {
+            box.addEventListener('input', function() {
+                this.style.minHeight = this.scrollHeight + 'px';
+            });
+        });
+    </script>
+</body>
+</html>
+
