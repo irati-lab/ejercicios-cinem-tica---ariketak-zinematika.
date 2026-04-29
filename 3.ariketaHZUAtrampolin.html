@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MRUA Práctica - Trampolín</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fontsource/plus-jakarta-sans@5.0.20/index.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; }
+        @media print {
+            body { background: #fff; padding: 0; margin: 0; }
+            .no-print { display: none !important; }
+            .sheet { box-shadow: none !important; border: none !important; border-radius: 0 !important; max-width: 100% !important; margin: 0 !important; }
+            input, textarea { border: 1px solid #94a3b8 !important; background: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .header-input { color: #000 !important; font-weight: bold; background: #fff !important; padding: 2px 5px !important; border-radius: 4px; }
+            
+            .bg-slate-900 { background: #0f172a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .bg-rose-50 { background: #fff1f2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .bg-slate-50 { background: #f8fafc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .page-break { page-break-before: always; }
+        }
+        .input-line {
+            border-bottom: 2px solid #e2e8f0;
+            background: transparent;
+            padding: 0.15rem 0.4rem;
+            outline: none;
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            font-size: 1.1rem;
+            color: #0f172a;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+        .input-line:focus { border-bottom-color: #3b82f6; }
+        .equation-input {
+            width: 50px;
+            border-bottom: 2px solid #e2e8f0;
+            background: transparent;
+            text-align: center;
+            outline: none;
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            padding: 0;
+            margin: 0 3px;
+        }
+        .graph-paper {
+            background-image: 
+                linear-gradient(#f1f5f9 1px, transparent 1px),
+                linear-gradient(90deg, #f1f5f9 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .box-area {
+            min-height: 70px;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            background: #ffffff;
+        }
+        .sentence-input {
+            width: 100%;
+            border-bottom: 1px solid #cbd5e1;
+            background: transparent;
+            outline: none;
+            padding: 0.5rem;
+            font-size: 0.95rem;
+            color: #334155;
+            transition: border-color 0.2s;
+        }
+        .sentence-input:focus { border-bottom-color: #3b82f6; }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen p-4 md:p-8">
+    
+    <!-- Controles -->
+    <div class="no-print fixed top-4 right-4 z-50 flex gap-3">
+        <button onclick="window.print()" class="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-slate-800 transition cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+            Imprimir / PDF
+        </button>
+        <button id="toggleKey" class="flex items-center gap-2 bg-white text-slate-700 px-4 py-2 rounded-lg shadow-lg border border-slate-200 hover:bg-slate-50 transition cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            Ver Solucionario
+        </button>
+    </div>
+
+    <div class="sheet max-w-4xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+        
+        <!-- Encabezado -->
+        <header class="bg-slate-900 text-white p-6 md:p-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold tracking-tight">Cinemática: MRUA Vertical</h1>
+                    <p class="text-slate-400 text-sm mt-1">Análisis de movimiento de un saltador</p>
+                </div>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div class="bg-white/10 p-3 rounded-lg">
+                        <span class="block text-xs text-slate-400 uppercase mb-1">Alumno/a</span>
+                        <input type="text" class="header-input bg-transparent w-full border-b border-slate-500 outline-none text-white placeholder-white/50" placeholder="Escribe tu nombre">
+                    </div>
+                    <div class="bg-white/10 p-3 rounded-lg">
+                        <span class="block text-xs text-slate-400 uppercase mb-1">Fecha</span>
+                        <input type="text" class="header-input bg-transparent w-full border-b border-slate-500 outline-none text-white placeholder-white/50" placeholder="DD/MM/AAAA">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Explicación -->
+        <section class="p-6 md:p-8 border-b border-slate-100">
+            <div class="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-lg">
+                <h2 class="font-semibold text-rose-900 mb-2">Explicación del Caso: Salto desde el trampolín</h2>
+                <p class="text-slate-700 leading-relaxed text-justify">
+                    Un saltador se encuentra en la punta del trampolín de <strong>10 metros</strong> de la piscina (<span class="italic font-serif">y₀</span>). En un instante determinado (<span class="italic font-serif">t = 0</span>), toma impulso hacia arriba saltando con una velocidad inicial de <strong>4 m/s</strong> (<span class="italic font-serif">v₀</span>). 
+                    <br><br>
+                    Mientras está en el aire, solo la fuerza de la gravedad actúa sobre él. Esta aceleración cambiará su velocidad, frenando primero su subida y luego haciéndolo caer hasta impactar con el agua.
+                </p>
+                <div class="mt-3 flex items-start gap-2 bg-white p-3 rounded border border-rose-200">
+                    <span class="text-xl">⚠️</span>
+                    <p class="text-sm text-rose-800"><strong>RECUERDA:</strong> En los movimientos verticales (caída libre o tiro vertical), la gravedad actúa sobre el cuerpo. La aceleración de la gravedad siempre va hacia <strong>abajo</strong>, por lo tanto su signo será negativo y su valor será <strong class="font-serif font-bold text-lg">a = -9,8 m/s²</strong> ¡aunque el problema no lo especifique!</p>
+                </div>
+            </div>
+        </section>
+
+        <main class="p-6 md:p-8 space-y-8">
+            <!-- PASO 1 -->
+            <section>
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-bold">1</span>
+                    <h3 class="font-semibold text-lg text-slate-800">Datos y Unidades</h3>
+                </div>
+                <p class="text-sm text-slate-500 mb-4">Escribe los datos del problema. ¡CUIDADO con los signos! Lo que va hacia arriba es positivo, y lo que va hacia abajo es negativo.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                        <span class="block text-sm text-slate-500 mb-1">Altura inicial</span>
+                        <span class="font-serif italic text-lg text-slate-800">y₀ = <input type="text" class="input-line w-24"> m</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                        <span class="block text-sm text-slate-500 mb-1">Velocidad inicial (arriba)</span>
+                        <span class="font-serif italic text-lg text-slate-800">v₀ = <input type="text" class="input-line w-24"> m/s</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                        <span class="block text-sm text-slate-500 mb-1">Aceleración de la gravedad</span>
+                        <span class="font-serif italic text-lg text-slate-800">a = <input type="text" class="input-line w-24"> m/s²</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PASO 2 -->
+            <section>
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-bold">2</span>
+                    <h3 class="font-semibold text-lg text-slate-800">Esquema y descripción del movimiento</h3>
+                </div>
+                
+                <div class="grid md:grid-cols-5 gap-6 items-stretch">
+                    <div class="md:col-span-2">
+                        <p class="text-sm text-slate-600 mb-2 font-semibold">A) Completa el esquema lateral:</p>
+                        <p class="text-xs text-slate-500 mb-3">Dibuja al saltador en su posición inicial (10m). Traza el vector de su velocidad inicial (<span class="text-blue-600 font-bold">↑</span>) y el de la aceleración de la gravedad (<span class="text-red-600 font-bold">↓</span>). Haz una línea indicando cómo será su trayectoria (subida y bajada).</p>
+                    </div>
+                    
+                    <div class="md:col-span-1 h-56 border-2 border-dashed border-slate-300 rounded-xl relative bg-white flex items-center justify-center">
+                        <!-- Eje Y -->
+                        <div class="h-[90%] border-l-[3px] border-slate-800 relative left-0">
+                            <!-- Flecha -->
+                            <div class="absolute -top-4 -left-3 text-xs font-bold text-slate-800">Y(m) ↑</div>
+                            
+                            <!-- Marcas -->
+                            <div class="absolute bottom-0 -left-2 w-4 h-1 bg-blue-500"></div>
+                            <div class="absolute bottom-[-6px] left-4 text-xs font-bold text-blue-600">0 (Agua)</div>
+                            
+                            <div class="absolute bottom-[25%] -left-1.5 w-3 h-0.5 bg-slate-500"></div>
+                            <div class="absolute bottom-[23%] left-3 text-xs text-slate-600">5</div>
+                            
+                            <div class="absolute bottom-[50%] -left-2 w-4 h-1 bg-rose-600"></div>
+                            <div class="absolute bottom-[48%] left-4 text-xs font-bold text-slate-800">10 (Trampolín)</div>
+                            
+                            <div class="absolute bottom-[75%] -left-1.5 w-3 h-0.5 bg-slate-500"></div>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-2 flex flex-col">
+                        <p class="text-sm text-slate-600 mb-2 font-semibold">B) Describe la trayectoria:</p>
+                        <p class="text-xs text-slate-500 mb-2">¿Qué ocurre con la velocidad mientras sube? ¿Por qué se detiene un instante en el aire en la altura máxima? ¿Qué sucede después?</p>
+                        <div class="box-area flex-grow" contenteditable="true"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PASO 3 -->
+            <section>
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-bold">3</span>
+                    <h3 class="font-semibold text-lg text-slate-800">Escribe TUS ecuaciones</h3>
+                </div>
+                <p class="text-sm text-slate-500 mb-4">Tomando las ecuaciones generales, sustituye TUS datos del paso 1 para obtener las ecuaciones específicas de este saltador. NOTA: Al ser movimiento vertical, usamos <span class="font-serif italic font-bold">y</span> en lugar de <span class="font-serif italic font-bold">x</span>.</p>
+                <div class="space-y-4">
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                        <span class="text-sm font-semibold text-slate-600 block mb-2">Ecuación de altura / posición:</span>
+                        <div class="flex flex-col md:flex-row gap-6 items-start md:items-center">
+                            <div class="text-slate-600 font-serif italic text-base">General: y = y₀ + v₀·t + ½·a·t²</div>
+                            <div class="flex items-center font-serif italic text-lg">
+                                Tuya: y = 
+                                <input type="text" class="equation-input"> + 
+                                <input type="text" class="equation-input">·t + ½·(
+                                <input type="text" class="equation-input">)·t²
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                        <span class="text-sm font-semibold text-slate-600 block mb-2">Ecuación de la velocidad:</span>
+                        <div class="flex flex-col md:flex-row gap-6 items-start md:items-center">
+                            <div class="text-slate-600 font-serif italic text-base">General: v = v₀ + a·t</div>
+                            <div class="flex items-center font-serif italic text-lg">
+                                Tuya: v = 
+                                <input type="text" class="equation-input"> + (
+                                <input type="text" class="equation-input">)·t
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PASO 4 -->
+            <section class="page-break">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-bold">4</span>
+                    <h3 class="font-semibold text-lg text-slate-800">Responde las preguntas (paso a paso)</h3>
+                </div>
+                <div class="space-y-8">
+                    
+                    <!-- OBJETIVO 1: Altura máxima -->
+                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 shadow-sm relative">
+                        <h4 class="font-bold text-slate-700 mb-4 text-base border-b border-slate-200 pb-2 flex items-center gap-2">
+                            <span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs">Objetivo 1</span> Análisis de la altura máxima
+                        </h4>
+                        <div class="grid md:grid-cols-2 gap-6 relative">
+                            <!-- A -->
+                            <div class="bg-white p-4 border border-slate-200 rounded-xl shadow-sm relative z-10 flex flex-col">
+                                <span class="font-semibold text-blue-700">A) Primero, ¿cuándo llegará a la altura máxima?</span>
+                                <p class="text-xs text-slate-500 mt-2 flex-grow">💡 Ayuda: En la altura máxima, el cuerpo se detiene un instante antes de empezar a caer. Es decir, su velocidad es cero (v = 0). Usa la ecuación de la velocidad para despejar el tiempo (t).</p>
+                                <div class="mt-4 font-serif text-center bg-slate-50 p-2 rounded">Resultado (t) = <input type="text" class="input-line w-24"> s</div>
+                            </div>
+                            
+                            <!-- Flecha (desktop) -->
+                            <div class="hidden md:flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-0 text-slate-300">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            </div>
+                            <!-- Flecha (mobile) -->
+                            <div class="flex md:hidden justify-center text-slate-300 my-[-10px] z-0">
+                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                            </div>
+
+                            <!-- B -->
+                            <div class="bg-white p-4 border border-slate-200 rounded-xl shadow-sm relative z-10 flex flex-col">
+                                <span class="font-semibold text-blue-700">B) Ahora, ¿cuál es esa altura máxima que alcanza?</span>
+                                <p class="text-xs text-slate-500 mt-2 flex-grow">💡 Ayuda: Ya sabes cuánto tiempo tarda en llegar arriba (la "t" obtenida en la caja A). Introduce ese tiempo en la ecuación de la posición (y).</p>
+                                <div class="mt-4 font-serif text-center bg-slate-50 p-2 rounded">Resultado (y) = <input type="text" class="input-line w-24"> m</div>
+                                <div class="mt-4 pt-3 border-t border-dashed border-slate-200">
+                                    <p class="text-xs text-slate-600 font-bold italic mb-2">📝 Tu conclusión en una frase:</p>
+                                    <input type="text" class="sentence-input" placeholder="Ej: La altura máxima que logra respecto al agua es de XX metros.">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- OBJETIVO 2: Altura de 5m -->
+                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 shadow-sm relative">
+                        <h4 class="font-bold text-slate-700 mb-4 text-base border-b border-slate-200 pb-2 flex items-center gap-2">
+                            <span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs">Objetivo 2</span> Análisis de la altura de 5 m
+                        </h4>
+                        <div class="grid md:grid-cols-2 gap-6 relative">
+                            <!-- C.1 -->
+                            <div class="bg-white p-4 border border-slate-200 rounded-xl shadow-sm relative z-10 flex flex-col">
+                                <span class="font-semibold text-blue-700">C.1) Primero, ¿cuándo estará a 5 m de altura?</span>
+                                <p class="text-xs text-slate-500 mt-2 flex-grow">💡 Ayuda: Ya sabes la posición (y = 5). Usa la ecuación de la posición para despejar el tiempo (t) (es una ecuación de 2º grado). Como queremos el instante en el que baja, toma el valor de t más positivo/grande.</p>
+                                <div class="mt-4 font-serif text-center bg-slate-50 p-2 rounded">Resultado (t) = <input type="text" class="input-line w-24"> s</div>
+                            </div>
+                            
+                            <!-- Flecha (desktop) -->
+                            <div class="hidden md:flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-0 text-slate-300">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            </div>
+                            <!-- Flecha (mobile) -->
+                            <div class="flex md:hidden justify-center text-slate-300 my-[-10px] z-0">
+                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                            </div>
+
+                            <!-- C.2 -->
+                            <div class="bg-white p-4 border border-slate-200 rounded-xl shadow-sm relative z-10 flex flex-col">
+                                <span class="font-semibold text-blue-700">C.2) Ahora, ¿qué velocidad lleva en ese momento?</span>
+                                <p class="text-xs text-slate-500 mt-2 flex-grow">💡 Ayuda: Ya sabes en qué instante ocurre (resultado "t" de la caja C.1). Introduce ese tiempo en tu ecuación de la velocidad.</p>
+                                <div class="mt-4 font-serif text-center bg-slate-50 p-2 rounded">Resultado (v) = <input type="text" class="input-line w-24"> m/s</div>
+                                <div class="mt-4 pt-3 border-t border-dashed border-slate-200">
+                                    <p class="text-xs text-slate-600 font-bold italic mb-2">📝 Tu conclusión en una frase:</p>
+                                    <input type="text" class="sentence-input" placeholder="Ej: Al pasar por los 5 metros, lleva una velocidad de XX m/s (negativa).">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- OBJETIVO 3: Caída al agua -->
+                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 shadow-sm relative">
+                        <h4 class="font-bold text-slate-700 mb-4 text-base border-b border-slate-200 pb-2 flex items-center gap-2">
+                            <span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs">Objetivo 3</span> Análisis de la caída al agua
+                        </h4>
+                        <div class="grid md:grid-cols-2 gap-6 relative">
+                            <!-- D.1 -->
+                            <div class="bg-white p-4 border border-slate-200 rounded-xl shadow-sm relative z-10 flex flex-col">
+                                <span class="font-semibold text-blue-700">D.1) Primero, ¿cuándo impactará contra el agua?</span>
+                                <p class="text-xs text-slate-500 mt-2 flex-grow">💡 Ayuda: La altura del agua es y = 0 m. Usa la ecuación de la posición y despeja el tiempo (t).</p>
+                                <div class="mt-4 font-serif text-center bg-slate-50 p-2 rounded">Resultado (t) = <input type="text" class="input-line w-24"> s</div>
+                            </div>
+                            
+                            <!-- Flecha (desktop) -->
+                            <div class="hidden md:flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-0 text-slate-300">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            </div>
+                            <!-- Flecha (mobile) -->
+                            <div class="flex md:hidden justify-center text-slate-300 my-[-10px] z-0">
+                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                            </div>
+
+                            <!-- D.2 -->
+                            <div class="bg-white p-4 border border-slate-200 rounded-xl shadow-sm relative z-10 flex flex-col">
+                                <span class="font-semibold text-blue-700">D.2) Ahora, ¿a qué velocidad impactará?</span>
+                                <p class="text-xs text-slate-500 mt-2 flex-grow">💡 Ayuda: Toma el tiempo (t) obtenido en la caja D.1 e introdúcelo en la ecuación de la velocidad para calcular la velocidad final.</p>
+                                <div class="mt-4 font-serif text-center bg-slate-50 p-2 rounded">Resultado (v) = <input type="text" class="input-line w-24"> m/s</div>
+                                <div class="mt-4 pt-3 border-t border-dashed border-slate-200">
+                                    <p class="text-xs text-slate-600 font-bold italic mb-2">📝 Tu conclusión en una frase:</p>
+                                    <input type="text" class="sentence-input" placeholder="Ej: En el instante exacto de tocar el agua, su velocidad es de XX m/s.">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- PASO 5 -->
+            <section>
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-bold">5</span>
+                    <h3 class="font-semibold text-lg text-slate-800">Representa las gráficas</h3>
+                </div>
+                <p class="text-sm text-slate-500 mb-4">Completa la tabla con diferentes valores de tiempo (¡atención a la escala de tiempo, el salto es muy rápido!) y después, sitúa los puntos en las gráficas milimetradas.</p>
+                
+                <div class="overflow-x-auto mb-6">
+                    <table class="w-full text-center border-collapse border border-slate-300 rounded-lg overflow-hidden">
+                        <thead class="bg-slate-100">
+                            <tr>
+                                <th class="p-2 border border-slate-300 font-semibold w-1/3">t (s)</th>
+                                <th class="p-2 border border-slate-300 font-semibold w-1/3">y (m)</th>
+                                <th class="p-2 border border-slate-300 font-semibold w-1/3">v (m/s)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="p-2 border border-slate-300">0</td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td></tr>
+                            <tr><td class="p-2 border border-slate-300">0.4</td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td></tr>
+                            <tr><td class="p-2 border border-slate-300">0.8</td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td></tr>
+                            <tr><td class="p-2 border border-slate-300">1.2</td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td></tr>
+                            <tr><td class="p-2 border border-slate-300">1.6</td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td></tr>
+                            <tr><td class="p-2 border border-slate-300">1.9</td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td><td class="p-2 border border-slate-300"><input type="text" class="input-line w-full"></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="border border-slate-200 rounded-xl p-3 h-72 relative bg-white graph-paper">
+                        <span class="absolute top-2 left-3 text-xs text-slate-600 font-semibold bg-white/80 px-1 z-10">Gráfica Altura - Tiempo (y − t)</span>
+                        <svg class="w-full h-full mt-8" viewBox="0 0 300 250" preserveAspectRatio="none">
+                            <path d="M 30 220 L 30 20 M 30 220 L 280 220" stroke="#0f172a" stroke-width="2" />
+                            <text x="260" y="245" class="text-xs fill-slate-500" font-family="sans-serif">t (s)</text>
+                            <text x="10" y="120" class="text-xs fill-slate-500" font-family="sans-serif" transform="rotate(-90 10,120)">y (m)</text>
+                            <text x="25" y="240" class="text-xs fill-slate-400" font-family="sans-serif">0</text>
+                        </svg>
+                    </div>
+                    <div class="border border-slate-200 rounded-xl p-3 h-72 relative bg-white graph-paper">
+                        <span class="absolute top-2 left-3 text-xs text-slate-600 font-semibold bg-white/80 px-1 z-10">Gráfica Velocidad - Tiempo (v − t)</span>
+                        <svg class="w-full h-full mt-8" viewBox="0 0 300 250" preserveAspectRatio="none">
+                            <!-- Eje X desplazado al medio porque la velocidad pasa a ser negativa -->
+                            <path d="M 30 120 L 280 120 M 30 220 L 30 20" stroke="#0f172a" stroke-width="2" />
+                            <text x="260" y="145" class="text-xs fill-slate-500" font-family="sans-serif">t (s)</text>
+                            <text x="10" y="70" class="text-xs fill-slate-500" font-family="sans-serif" transform="rotate(-90 10,70)">v (m/s)</text>
+                            <text x="20" y="115" class="text-xs fill-slate-400" font-family="sans-serif">0</text>
+                        </svg>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <div id="answerKey" class="hidden bg-amber-50 border-t-2 border-amber-200 p-6 md:p-8 page-break">
+            <h3 class="text-xl font-bold text-amber-800 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Solucionario (Solo para el docente)
+            </h3>
+            <div class="grid md:grid-cols-2 gap-4 text-sm text-amber-900">
+                <div class="p-3 bg-white rounded border border-amber-200">
+                    <strong>Paso 1:</strong> y₀ = 10 m | v₀ = 4 m/s (arriba) | a = -9.8 m/s² (abajo)
+                </div>
+                <div class="p-3 bg-white rounded border border-amber-200">
+                    <strong>Ecuaciones:</strong> y = 10 + 4t - 4.9t² | v = 4 - 9.8t
+                </div>
+                <div class="p-3 bg-white rounded border border-amber-200">
+                    <strong>A) t altura máx:</strong> v=0 → 0 = 4 - 9.8t → <strong>t = 0.41 s</strong>
+                </div>
+                <div class="p-3 bg-white rounded border border-amber-200">
+                    <strong>B) Altura máx (y):</strong> y = 10 + 4(0.41) - 4.9(0.41)² → <strong>10.82 m</strong>
+                </div>
+                <div class="p-3 bg-white rounded border border-amber-200">
+                    <strong>C.1) t en 5m:</strong> 5 = 10 + 4t - 4.9t² → 4.9t² - 4t - 5 = 0 → <strong>t = 1.50 s.</strong>
+                </div>
+                <div class="p-3 bg-white rounded border border-amber-200">
+                    <strong>C.2) v en 5m:</strong> v = 4 - 9.8(1.50) = <strong>-10.70 m/s</strong> (baja)
+                </div>
+                <div class="p-3 bg-white rounded border border-amber-200">
+                    <strong>D.1) t en agua (y=0):</strong> 0 = 10 + 4t - 4.9t² → 4.9t² - 4t - 10 = 0 → <strong>t = 1.89 s.</strong>
+                </div>
+                <div class="p-3 bg-white rounded border border-amber-200">
+                    <strong>D.2) v en agua:</strong> v = 4 - 9.8(1.89) = <strong>-14.52 m/s</strong> (baja)
+                </div>
+            </div>
+        </div>
+
+        <footer class="bg-slate-50 p-4 text-center text-xs text-slate-400 border-t border-slate-200">
+            Diseñado para 4º ESO / Bachillerato · Física · Movimiento Vertical
+        </footer>
+    </div>
+
+    <script>
+        const keyBtn = document.getElementById('toggleKey');
+        const keyPanel = document.getElementById('answerKey');
+        let isUnlocked = false;
+
+        keyBtn.addEventListener('click', () => {
+            if (!isUnlocked) {
+                const password = prompt("🔒 Zona del docente: Introduce la contraseña para ver el solucionario.");
+                if (password === 'agoitzpass') {
+                    isUnlocked = true;
+                    keyPanel.classList.remove('hidden');
+                    keyBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg> Ocultar Solucionario`;
+                    keyBtn.classList.add('text-amber-700', 'border-amber-200');
+                    keyBtn.classList.remove('text-slate-700', 'border-slate-200');
+                    keyPanel.scrollIntoView({ behavior: 'smooth' });
+                } else if (password !== null) {
+                    alert("❌ Contraseña incorrecta.");
+                }
+            } else {
+                isUnlocked = false;
+                keyPanel.classList.add('hidden');
+                keyBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg> Ver Solucionario`;
+                keyBtn.classList.remove('text-amber-700', 'border-amber-200');
+                keyBtn.classList.add('text-slate-700', 'border-slate-200');
+            }
+        });
+
+        document.querySelectorAll('[contenteditable]').forEach(box => {
+            box.addEventListener('input', function() {
+                this.style.minHeight = this.scrollHeight + 'px';
+            });
+        });
+    </script>
+</body>
+</html>
